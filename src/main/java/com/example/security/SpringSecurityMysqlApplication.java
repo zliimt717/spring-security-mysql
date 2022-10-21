@@ -6,6 +6,7 @@ import com.example.security.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -18,15 +19,29 @@ public class SpringSecurityMysqlApplication {
 	@Autowired
 	private AppUserRepository appUserRepository;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@PostConstruct
 	public void initUsers(){
-		List<AppUser> customers = Stream.of(
-				new AppUser("Admin","xin.gu1707@gmail.com","123456", AppUserRole.ADMIN,false,false),
-				new AppUser("user1","us1@gmail.com","pwd1",AppUserRole.USER,false,false),
-				new AppUser("user2","us2@gmail.com","pwd2",AppUserRole.USER,false,false),
-				new AppUser("user3","us3@gmail.com","pwd3",AppUserRole.USER,false,false)
-		).collect(Collectors.toList());
-		appUserRepository.saveAll(customers);
+		AppUser admin=new AppUser();
+		admin.setUsername("Admin");
+		admin.setPassword(passwordEncoder.encode("123456"));
+		admin.setEmail("xin.gu1707@gmail.com");
+		admin.setAppUserRole(AppUserRole.ADMIN);
+		admin.setEnabled(false);
+		admin.setLocked(false);
+
+		appUserRepository.save(admin);
+
+		AppUser user1=new AppUser();
+		user1.setUsername("user");
+		user1.setPassword(passwordEncoder.encode("user"));
+		user1.setEmail("user1@gmail.com");
+		user1.setAppUserRole(AppUserRole.USER);
+		user1.setEnabled(false);
+		user1.setLocked(false);
+		appUserRepository.save(user1);
 	}
 
 	public static void main(String[] args) {
